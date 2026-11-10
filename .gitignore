@@ -1,0 +1,45 @@
+# Python / virtual environment
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.ipynb_checkpoints/
+
+# Tooling caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Data (downloaded / generated – never commit patient data!)
+# No trailing slash: on fep these are links to ~/AITDM_Project (Fep/setup_fep.sh)
+/data
+*.npz
+
+# Local planning notes
+brainstorming/
+
+# Run artefacts
+/outputs
+/logs
+lightning_logs/
+mlruns/
+wandb/
+*.pt
+*.pth
+*.fab
+
+# Secrets / local config
+.env
+.env.*
+!.env.example
+
+# OS / editor
+.DS_Store
+__MACOSX/
+.idea/
+.vscode/

@@ -1,0 +1,29 @@
+# Core dependencies. Python 3.11 or 3.12; Windows, Linux and macOS.
+#
+#   python -m venv .venv
+#   Windows:      .venv\Scripts\activate
+#   Linux/macOS:  source .venv/bin/activate
+#   pip install -r requirements.txt
+#
+# With an NVIDIA GPU, install the matching CUDA build of torch / torchvision first
+# (https://pytorch.org/get-started/locally/); everything also runs on CPU.
+
+# Models
+torch==2.14.1
+torchvision==0.29.1
+monai==1.6.1
+
+# Data handling, metrics and plots
+numpy>=1.26
+pandas>=2.1
+scikit-learn>=1.4
+scipy>=1.11
+matplotlib>=3.8
+pillow>=10.0
+
+# Notebooks
+notebook>=7.0
+nbconvert>=7.0
+
+# Tests
+pytest>=8.0

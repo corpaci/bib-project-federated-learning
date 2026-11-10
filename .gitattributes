@@ -1,0 +1,7 @@
+# Keep Unix line endings in the checkout, even when the repository is cloned
+# with Git for Windows (core.autocrlf=true). Shell scripts with Windows (CRLF)
+# line endings fail in WSL / Linux with "$'\r': command not found".
+* text=auto eol=lf
+*.png binary
+*.npz binary
+*.pt binary

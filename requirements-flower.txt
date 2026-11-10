@@ -1,0 +1,8 @@
+# Optional: the Flower backend of experiments/federated.py (--backend flower).
+# Flower supports Linux and macOS. On Windows, use it inside WSL2; the default
+# in-process backend needs none of this and runs natively on Windows.
+#
+#   pip install -r requirements.txt -r requirements-flower.txt
+#
+# [simulation] pulls in Ray, which `flwr run` uses to simulate the clients.
+flwr[simulation]==1.41.0
