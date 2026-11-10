@@ -7,7 +7,7 @@ name = "aitdm-fl"
 version = "1.0.0"
 description = "AITDM – Federated Learning with Flower, PyTorch and MONAI"
 requires-python = ">=3.11"
-# The exact versions are pinned in ../requirements.txt
+# The exact versions are pinned in ../requirements.txt and ../requirements-flower.txt
 dependencies = [
     "flwr[simulation]>=1.41.0",
     "torch>=2.4",
@@ -41,7 +41,7 @@ save-dir = ""
 
 # Seed for the model initialisation, the clients' shuffling / augmentation and
 # the DP noise: the same seed gives the same result. Report mean +- std over
-# seeds 1, 2, 3 (experiments/run_seeds.py does this for you).
+# seeds 1, 2, 3 (experiments/federated.py does this for you).
 seed = 1
 num-server-rounds = 5
 local-epochs = 1

@@ -15,20 +15,12 @@ dist/
 .coverage
 htmlcov/
 
-# Data (downloaded / generated – never commit patient data!)
-# No trailing slash: on fep these are links to ~/AITDM_Project (Fep/setup_fep.sh)
+# Data (downloaded / generated). AutoVI is CC BY-NC-SA 4.0: never commit it.
 /data
 *.npz
 
-# Local planning notes
-brainstorming/
-
 # Run artefacts
 /outputs
-/logs
-lightning_logs/
-mlruns/
-wandb/
 *.pt
 *.pth
 *.fab

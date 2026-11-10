@@ -9,13 +9,15 @@ the centralised baseline, so that both are measured in exactly the same way.
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
 
 import numpy as np
 import torch
 from sklearn.metrics import balanced_accuracy_score, f1_score
 
-from aitdm_fl.task import load_npz_arrays, load_pooled_validation, model_from_test_set
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "fl_app"))
+from aitdm_fl.task import load_npz_arrays, load_pooled_validation, model_from_test_set  # noqa: E402
 
 
 @torch.no_grad()

@@ -2,7 +2,7 @@
 
 This page explains how the project trains PaDiM across several clients and why the
 result is the same model a single site would get from all the images together.
-It is the reference for `experiments/padim_federated.py`,
+It is the reference for `experiments/padim_federated.py`, `experiments/federated.py`,
 `fl_app/aitdm_fl/padim_server_app.py` and `fl_app/aitdm_fl/padim_client_app.py`.
 
 ## 1. What PaDiM stores
@@ -51,35 +51,33 @@ FedAvg on a neural network is that one round is enough and nothing is approximat
    the server refuses to aggregate clients whose grids differ.
 
 `tests/test_padim_federated.py` checks all three, and checks that the federated and
-pooled models agree to numerical precision.
+pooled models agree. The aggregation is exact; with the real ResNet18 the two models
+can still differ by about 1e-6 relative, because the float32 network returns slightly
+different features when the same image is processed in a different batch.
 
 ## 4. Run it
 
 PaDiM needs partitions whose training split contains normal images only
 (the official AutoVI protocol):
 
-```bash
-python data_splitting/autovi.py --zips data/raw/autovi/*.zip \
-    --out data/raw/autovi_official_npz --mode official --size 128
-python data_splitting/autovi_official_partitions.py \
-    --npz-dir data/raw/autovi_official_npz --out data/partitions/autovi_official
+```text
+python data_splitting/autovi.py --zips data/raw/autovi/pipe_staple.zip data/raw/autovi/pipe_clip.zip data/raw/autovi/engine_wiring.zip --out data/raw/autovi_official_npz --mode official --size 128
+python data_splitting/autovi_official_partitions.py --npz-dir data/raw/autovi_official_npz --out data/partitions/autovi_official
 
-# centralised (pooled) and per-client baselines, seeds 1 2 3
-python experiments/padim_experiment.py --partitions data/partitions/autovi_official --figures
-
-# federated, through Flower (one SuperLink, three clients, one round)
-bash scripts/run_padim_federated.sh data/partitions/autovi_official "seed=1"
+python experiments/padim_experiment.py --partitions data/partitions/autovi_official --name padim-centralised --figures
+python experiments/federated.py --model padim --partitions data/partitions/autovi_official --name padim-federated
 ```
 
 The federated run writes `metrics.json` and the aggregated model to
-`outputs/padim-federated-<partitions>-<timestamp>/`. Its test AUROC should match the
-`pooled` arm of `padim_experiment.py` for the same seed.
+`outputs/experiments/padim-federated/seed<k>/`. Its test AUROC matches the `pooled`
+arm of `padim_experiment.py` for the same seed. Add `--backend flower` to run the
+same computation as a Flower app (`fl_app/`: one ServerApp, one ClientApp per client).
 
 ## 5. What this setup does not give you
 
 - **The gradient-based trust tools do not apply.** `num-server-rounds`,
-  `local-epochs`, `learning-rate`, `strategy` and every `dp-*` and attack key are
-  ignored in `padim-mode`. There are no model updates to clip, so the Flower
+  `local-epochs`, `learning-rate`, `strategy` and every `dp-*` and attack key of the
+  Flower app are ignored in `padim-mode`. There are no model updates to clip, so the Flower
   differential-privacy wrapper cannot be reused; noise would have to be added to
   `S` and `Q` directly.
 - **Statistics are not private by default.** `S_k / n_k` is the client's mean

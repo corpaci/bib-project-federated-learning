@@ -7,10 +7,11 @@
 %
 % Where the numbers come from
 %   Dataset, split, heterogeneity ..... notebooks/stage_01/data_lead.ipynb
-%   Model, metrics, baseline results .. notebooks/stage_01/baseline_model_with_markdowns.ipynb
-%   Federated vs centralised .......... presentation/results_macros.tex
-%                                       (written by presentation/make_results_macros.py)
-% Figures in figures/ are the saved outputs of those notebooks.
+%   PaDiM on the labelled split ....... notebooks/stage_01/baseline_model_with_markdowns.ipynb
+%   Centralised vs federated .......... results/stage_01/*.json
+%                                       (written by experiments/padim_experiment.py,
+%                                        experiments/centralised.py, experiments/federated.py)
+% Figures in figures/ are saved outputs of the notebooks and of padim_experiment.py.
 % ---------------------------------------------------------------------------
 \documentclass[aspectratio=169,10pt]{beamer}
 
@@ -47,7 +48,6 @@
 \setbeamercolor{date in head/foot}{bg=upbdark,fg=white}
 \setbeamertemplate{navigation symbols}{}
 \setbeamertemplate{itemize items}[circle]
-\setbeamertemplate{caption}{\raggedright\small\insertcaption\par}
 \setbeamertemplate{footline}{%
   \leavevmode%
   \hbox{%
@@ -67,9 +67,6 @@
 % appear on the title and closing slides. Without the files nothing is drawn.
 \newcommand{\optlogo}[1]{\IfFileExists{logos/#1}{\includegraphics[height=1.5cm]{logos/#1}\hspace{0.4cm}}{}}
 \newcommand{\logorow}{\optlogo{upb.png}\optlogo{acs.png}\optlogo{logo3.png}\optlogo{logo4.png}}
-
-% Results of the reproducible runs (federated vs centralised).
-\input{results_macros.tex}
 
 \tikzset{
   box/.style={draw, rounded corners=2pt, fill=black!8, align=center,
@@ -229,7 +226,7 @@ Faculty of Automatic Control and Computers\\
 
 \begin{frame}{One client per production part}
   \centering
-  \includegraphics[width=0.92\textwidth]{figures/data_clients_skew.png}
+  \includegraphics[width=0.78\textwidth]{figures/data_clients_skew.png}
   \par\vspace{0.1cm}
   \small
   \begin{tabular}{llrrrr}
@@ -243,7 +240,7 @@ Faculty of Automatic Control and Computers\\
     \multicolumn{2}{l}{Shared test set} & 382 & -- & 30.9 & 0.378 \\
     \bottomrule
   \end{tabular}
-  \par{\footnotesize Labelled split used for the data analysis (20\% test, seed 42).}
+  \par{\footnotesize Labelled split (setup A in the results): 20\% test, seed 42.}
 \end{frame}
 
 \begin{frame}{How different are the clients?}
@@ -271,7 +268,8 @@ Faculty of Automatic Control and Computers\\
 
 \begin{frame}{Real split and stress-test splits}
   \centering
-  \small
+  \footnotesize
+  \setlength{\tabcolsep}{4pt}
   \begin{tabular}{llrrrll}
     \toprule
     Strategy & Setting & Mean EMD & Mean JSD & Size Gini & Client sizes & Defect \% per client \\
@@ -406,7 +404,31 @@ Faculty of Automatic Control and Computers\\
 % ===========================================================================
 \section{Results}
 
-\begin{frame}{Centralised baseline (baseline notebook)}
+\begin{frame}{Two evaluation setups}
+  \centering
+  \small
+  \begin{tabular}{p{2.6cm}p{5.3cm}p{5.3cm}}
+    \toprule
+     & \textbf{A. Labelled split} & \textbf{B. Official AutoVI split} \\
+    \midrule
+    Built by & our re-split by category, 20\% test, seed 42 & AutoVI's own train and test folders \\
+    Clients & 3 (one per part) & 3 (one per part) \\
+    Train, normal images & 348 / 266 / 242 (856) & 242 / 166 / 162 (570) \\
+    Defects in train/val & yes (PaDiM ignores those in train) & none \\
+    Test set & 382 images: 264 normal, 118 defects & 1176 images: 608 normal, 568 defects \\
+    Image size & $128\times128$ & $128\times128$ \\
+    Used for & PaDiM notebook, supervised CNN & PaDiM centralised vs.\ federated \\
+    \bottomrule
+  \end{tabular}
+  \par\vspace{0.3cm}
+  \begin{alertblock}{Why two}
+    PaDiM follows the dataset's own protocol (B), so it can be set next to the
+    published scores. The supervised CNN needs defects in training, which only the
+    labelled re-split (A) provides. Numbers from A and B are not comparable with each other.
+  \end{alertblock}
+\end{frame}
+
+\begin{frame}{PaDiM on the labelled split (setup A, baseline notebook)}
   \begin{columns}[T]
     \begin{column}{0.4\textwidth}
       \small
@@ -414,17 +436,17 @@ Faculty of Automatic Control and Computers\\
         \toprule
         Metric & Validation & Test \\
         \midrule
-        AUROC         & $0.775 \pm 0.010$ & $0.755 \pm 0.009$ \\
-        AP            & $0.485 \pm 0.048$ & $0.481 \pm 0.013$ \\
-        Balanced acc. & $0.579 \pm 0.023$ & $0.587 \pm 0.014$ \\
-        Macro-F1      & $0.585 \pm 0.030$ & $0.594 \pm 0.019$ \\
-        TPR           & $0.208 \pm 0.045$ & $0.238 \pm 0.037$ \\
-        TNR           & $0.949 \pm 0.000$ & $0.936 \pm 0.010$ \\
+        AUROC         & $0.703 \pm 0.016$ & $0.654 \pm 0.001$ \\
+        AP            & $0.528 \pm 0.009$ & $0.473 \pm 0.013$ \\
+        Balanced acc. & $0.607 \pm 0.012$ & $0.564 \pm 0.011$ \\
+        Macro-F1      & $0.614 \pm 0.016$ & $0.546 \pm 0.019$ \\
+        TPR           & $0.263 \pm 0.025$ & $0.175 \pm 0.030$ \\
+        TNR           & $0.950 \pm 0.000$ & $0.952 \pm 0.008$ \\
         \bottomrule
       \end{tabular}
       \par\vspace{0.2cm}
-      {\footnotesize Setup of this notebook run: 5 clients, $64\times64$ images,
-      2029 pooled normal training images, test set of 600 normal and 189 defect images.}
+      {\footnotesize One model fitted on the 856 normal training images of all
+      clients. Mean $\pm$ std over seeds 1, 2, 3.}
     \end{column}
     \begin{column}{0.58\textwidth}
       \centering
@@ -433,42 +455,39 @@ Faculty of Automatic Control and Computers\\
   \end{columns}
   \vspace{0.1cm}
   \begin{alertblock}{Reading}
-    The ranking is clearly better than random, but at a 5\% false-alarm rate only
-    about 1 defect in 4 is caught: the two score distributions overlap.
+    The ranking is better than random, but with 95\% of good parts accepted only
+    about 1 defect in 6 is caught: the two score distributions overlap.
   \end{alertblock}
 \end{frame}
 
-\begin{frame}{Pooled model vs.\ one model per client (baseline notebook)}
+\begin{frame}{Pooled model vs.\ one model per client (setup A)}
   \centering
   \small
-  \begin{tabular}{crcccc}
+  \begin{tabular}{clrcccc}
     \toprule
-           &            & \multicolumn{2}{c}{AUROC} & \multicolumn{2}{c}{Balanced accuracy} \\
-    \cmidrule(lr){3-4}\cmidrule(lr){5-6}
-    Client & Val images & Pooled & Local & Pooled & Local \\
+           &         &            & \multicolumn{2}{c}{AUROC} & \multicolumn{2}{c}{Balanced accuracy} \\
+    \cmidrule(lr){4-5}\cmidrule(lr){6-7}
+    Client & Station & Val images & Pooled & Local & Pooled & Local \\
     \midrule
-    0 & 157 & --                & --                & $0.964 \pm 0.007$ & $0.949 \pm 0.000$ \\
-    1 & 37  & $0.793 \pm 0.040$ & $0.749 \pm 0.077$ & $0.620 \pm 0.022$ & $0.677 \pm 0.024$ \\
-    2 & 33  & $0.409 \pm 0.186$ & $0.134 \pm 0.049$ & $0.398 \pm 0.200$ & $0.293 \pm 0.037$ \\
-    3 & 202 & $0.797 \pm 0.011$ & $0.797 \pm 0.010$ & $0.587 \pm 0.030$ & $0.563 \pm 0.038$ \\
-    4 & 30  & $0.726 \pm 0.007$ & $0.600 \pm 0.025$ & $0.566 \pm 0.029$ & $0.516 \pm 0.066$ \\
+    0 & engine\_wiring & 101 & $0.743 \pm 0.025$ & $0.761 \pm 0.014$ & $0.650 \pm 0.015$ & $0.617 \pm 0.032$ \\
+    1 & pipe\_clip     & 62  & $0.646 \pm 0.056$ & $0.730 \pm 0.043$ & $0.565 \pm 0.034$ & $0.535 \pm 0.045$ \\
+    2 & pipe\_staple   & 58  & $0.618 \pm 0.083$ & $0.776 \pm 0.058$ & $0.502 \pm 0.030$ & $0.488 \pm 0.032$ \\
     \bottomrule
   \end{tabular}
   \par\vspace{0.25cm}
   \begin{columns}[T]
     \begin{column}{0.48\textwidth}
-      \begin{block}{Observations}
-        \begin{itemize}
-          \item The pooled model is equal or better in AUROC on every client that
-                has both classes.
-          \item Client 0 has no defects in validation, so AUROC is undefined there.
-        \end{itemize}
+      \begin{block}{Observation}
+        In AUROC, every station is served \textbf{better by its own model} than by
+        the pooled one. The gap is small for engine\_wiring and large for
+        pipe\_staple ($0.618$ vs.\ $0.776$).
       \end{block}
     \end{column}
     \begin{column}{0.48\textwidth}
-      \begin{alertblock}{Weak point}
-        Client 2 has only 11 normal training images. Its local model is worse than
-        random (AUROC 0.134); pooling helps but does not fix it (0.409).
+      \begin{alertblock}{Likely reason}
+        PaDiM keeps one mean and covariance per image position. Three different
+        parts at the same position give a wide ``normal'' that hides small defects.
+        The stations differ strongly in appearance (97.3\% separable).
       \end{alertblock}
     \end{column}
   \end{columns}
@@ -477,13 +496,94 @@ Faculty of Automatic Control and Computers\\
 \begin{frame}{Where the model looks: anomaly maps}
   \centering
   \includegraphics[width=0.98\textwidth]{figures/base_anomaly_maps.png}
-  \par{\footnotesize Four normal and four defective test images with their PaDiM anomaly
-  maps (red = far from the learned normal appearance). The map is produced by the
-  model itself, with no extra explanation method.}
+  \par{\footnotesize Four normal and four defective test images with the pooled model's
+  anomaly maps (red = far from the learned normal appearance). The map comes from
+  the model itself. Some normal images also show red areas, in line with the
+  modest scores: the maps are not yet a reliable explanation.}
 \end{frame}
 
-\begin{frame}{Federated vs.\ centralised}
-  \input{results_slide.tex}
+\begin{frame}{Federated vs.\ centralised: PaDiM (setup B)}
+  \begin{columns}[T]
+    \begin{column}{0.56\textwidth}
+      \footnotesize
+      \setlength{\tabcolsep}{4pt}
+      \begin{tabular}{lccc}
+        \toprule
+        Training & AUROC & AP & Bal.\ acc. \\
+        \midrule
+        Centralised (pooled images)   & $0.624 \pm 0.017$ & $0.619 \pm 0.012$ & $0.564 \pm 0.009$ \\
+        Federated, Flower, 1 round    & $0.624 \pm 0.017$ & $0.619 \pm 0.012$ & $0.564 \pm 0.009$ \\
+        Federated, in-process         & $0.624 \pm 0.017$ & $0.619 \pm 0.012$ & $0.564 \pm 0.009$ \\
+        \midrule
+        Local models, mean of 3       & $0.648 \pm 0.026$ & $0.563 \pm 0.021$ & $0.538 \pm 0.005$ \\
+        \bottomrule
+      \end{tabular}
+      \par\vspace{0.15cm}
+      {\footnotesize Global test set, seeds 1, 2, 3. Per seed, the federated and
+      centralised AUROC differ by at most $2\times10^{-6}$.}
+      \par\vspace{0.2cm}
+      \begin{tabular}{lccc}
+        \toprule
+        AUROC on own test slice & Pooled & Local & Paper \\
+        \midrule
+        engine\_wiring & $0.728$ & $0.726$ & $0.792$ \\
+        pipe\_clip     & $0.510$ & $0.566$ & $0.626$ \\
+        pipe\_staple   & $0.509$ & $0.651$ & $0.546$ \\
+        \bottomrule
+      \end{tabular}
+      \par\vspace{0.1cm}
+      {\footnotesize Paper: PaDiM per category in Carvalho et al.\ (2024), at a larger image size.}
+    \end{column}
+    \begin{column}{0.42\textwidth}
+      \begin{block}{Result}
+        The federated model \alert{is} the centralised model: no accuracy is lost
+        by keeping the images at the stations.
+      \end{block}
+      \begin{alertblock}{But}
+        The shared model is weak for pipe\_clip and pipe\_staple (AUROC near 0.5).
+        Federation reproduces pooling exactly, including its weakness.
+      \end{alertblock}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Federated vs.\ centralised: supervised CNN with FedAvg (setup A)}
+  \begin{columns}[T]
+    \begin{column}{0.6\textwidth}
+      \footnotesize
+      \setlength{\tabcolsep}{4pt}
+      \begin{tabular}{lccc}
+        \toprule
+        Training & Accuracy & Bal.\ acc. & Macro-F1 \\
+        \midrule
+        Centralised, 10 epochs        & $0.913 \pm 0.012$ & $0.887 \pm 0.008$ & $0.896 \pm 0.013$ \\
+        FedAvg, Flower, 10 rounds     & $0.869 \pm 0.009$ & $0.849 \pm 0.003$ & $0.847 \pm 0.008$ \\
+        FedAvg, in-process, 10 rounds & $0.866 \pm 0.020$ & $0.854 \pm 0.009$ & $0.846 \pm 0.018$ \\
+        \bottomrule
+      \end{tabular}
+      \par\vspace{0.15cm}
+      {\footnotesize Test set of 382 images, seeds 1, 2, 3. Small CNN classifier, 1 local epoch per round,
+      3 clients, sample-weighted averaging.}
+      \par\vspace{0.25cm}
+      \begin{tabular}{lcc}
+        \toprule
+        Worst client, validation bal.\ acc. & Centralised & FedAvg (Flower) \\
+        \midrule
+        & $0.854 \pm 0.009$ & $0.788 \pm 0.030$ \\
+        \bottomrule
+      \end{tabular}
+    \end{column}
+    \begin{column}{0.38\textwidth}
+      \begin{block}{Result}
+        FedAvg costs about \alert{3 to 4 points} of balanced accuracy against
+        centralised training, and more for the worst-served client.
+      \end{block}
+      \begin{block}{Caveat}
+        This model \textbf{sees defects in training}. It can only recognise the
+        defect types it was shown, and its scores cannot be compared with PaDiM's.
+      \end{block}
+    \end{column}
+  \end{columns}
 \end{frame}
 
 % ===========================================================================
@@ -491,19 +591,21 @@ Faculty of Automatic Control and Computers\\
 
 \begin{frame}{Limitations observed in Stage 1}
   \begin{itemize}
-    \item \textbf{Detection is modest.} Test AUROC around 0.75; most defects are missed
-          at a 5\% false-alarm rate.
-    \item \textbf{Small images.} Runs used $64\times64$ or $128\times128$ inputs; the
-          originals are $400\times400$ and some defects are small.
-    \item \textbf{Uneven clients.} A client with very few normal images gets an
-          unusable local model and stays the worst-served client after pooling.
-    \item \textbf{One model for three different parts.} The reference paper trains
-          one model per category; our pooled model mixes them.
-    \item \textbf{Comparison with the paper is indirect.} Different image size and
-          a shared model, so the published PaDiM scores (79.2 / 62.6 / 54.6 AUROC
-          for wiring / clip / staple) are context, not a like-for-like target.
+    \item \textbf{Unsupervised detection is modest.} Test AUROC 0.62 to 0.65; most
+          defects are missed when 95\% of good parts are accepted.
+    \item \textbf{Small images.} All runs use $128\times128$ inputs; the originals are
+          $400\times400$ and some defects are small.
+    \item \textbf{One shared model for three different parts.} Pooling, and therefore
+          federation, is worse than a local model for two of the three stations.
+    \item \textbf{Comparison with the paper is indirect.} The paper uses a larger
+          image size; our local models reach 0.726 / 0.566 / 0.651 AUROC against
+          0.792 / 0.626 / 0.546 published.
+    \item \textbf{The supervised CNN is not a like-for-like alternative.} It needs
+          labelled defects, which AutoVI's protocol does not provide for training.
     \item \textbf{Statistics are not private by default.} $S_k/n_k$ is the
           client's mean feature map.
+    \item \textbf{Three of the six AutoVI categories} are used (those delivered at
+          $400\times400$).
   \end{itemize}
 \end{frame}
 
@@ -515,8 +617,8 @@ Faculty of Automatic Control and Computers\\
         how much does the shared model degrade, and can the server notice?
       \end{block}
       \begin{block}{Fairness across stations}
-        Report the worst-served client next to the average; test per-station
-        thresholds.
+        Report the worst-served station next to the average; test a shared
+        backbone with per-station statistics or thresholds.
       \end{block}
     \end{column}
     \begin{column}{0.48\textwidth}

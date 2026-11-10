@@ -1,0 +1,54 @@
+{
+  "experiment": "padim_federated_inprocess",
+  "partitions": "data/partitions/autovi_official",
+  "seeds": [
+    1,
+    2,
+    3
+  ],
+  "backend": "inprocess",
+  "arms": {
+    "federated": {
+      "auroc": {
+        "mean": 0.6241327487954039,
+        "std": 0.016660388039157436,
+        "n": 3
+      },
+      "average_precision": {
+        "mean": 0.619426641564918,
+        "std": 0.012347937780960333,
+        "n": 3
+      },
+      "balanced_accuracy_at_threshold": {
+        "mean": 0.5638397269582406,
+        "std": 0.008527101702240173,
+        "n": 3
+      },
+      "tpr_at_95_tnr": {
+        "mean": 0.16490610328638497,
+        "std": 0.007329809857275106,
+        "n": 3
+      },
+      "accuracy": {
+        "mean": 0.576530612244898,
+        "std": 0.008111727903205338,
+        "n": 3
+      },
+      "f1_macro": {
+        "mean": 0.499172383966187,
+        "std": 0.016835983490810582,
+        "n": 3
+      },
+      "tpr": {
+        "mean": 0.1907276995305164,
+        "std": 0.02613315032654027,
+        "n": 3
+      },
+      "tnr": {
+        "mean": 0.9369517543859649,
+        "std": 0.01580431502785041,
+        "n": 3
+      }
+    }
+  }
+}
